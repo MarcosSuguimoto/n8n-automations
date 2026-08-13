@@ -1,0 +1,267 @@
+{
+  "name": "Bot - Buscador de curiosidades",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "👋 Olá. Eu sou o Bot de Fatos Curiosos.\nQuer conhecer um fato ou curiosidade ?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8ee86986-5dc0-4d7a-92e1-31acb60a6537",
+      "name": "Recebe mensagem do usuário",
+      "webhookId": "97d48dac-0657-4e23-82fa-4f3fa73841af"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mymemory.translated.net/get?q={{ encodeURIComponent($json.text) }}&langpair=en|pt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "c31aef6b-1357-48fc-a855-75e3f2ff337b",
+      "name": "tradução ao português"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61c93f86-550d-4aaf-b7f7-20a09a98a285",
+              "name": "=output",
+              "value": "=💡 **Você sabia?**\n\n{{ $json.responseData.translatedText }}\n\n---\n✨ **Quer saber mais ?**",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "4aceb8b9-cf62-4881-91a4-21d60d9e1475",
+      "name": "Formata saída de texto"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o texto enviado pelo usuário no Chat Trigger\nconst entrada = ($json.chatInput || '').toLowerCase().trim();\n\n// Lista de termos/gatilhos válidos para solicitar uma curiosidade\nconst termosValidos = [\n  'curiosidade',\n  'fato',\n  'pode falar',\n  'claro',\n  'diga',\n  'diga ai',\n  'me conte',\n  'me fala',\n  'manda',\n  'outra',\n  'mais um',\n  'aleatorio',\n  'conhecimento',\n  'sim',\n  'uma boa',\n  'info'\n];\n\n// Verifica se a mensagem contém pelo menos UM dos termos válidos\nconst eValido = termosValidos.some(termo => entrada.includes(termo));\n\nreturn [{\n  json: {\n    textoOriginal: $json.chatInput,\n    eValido: eValido\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b36209a1-072b-411e-bd14-74bb73093773",
+      "name": "Normaliza e valida Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc247c44-9b0f-4be6-8917-67975731b19d",
+              "name": "output",
+              "value": "🤖 Gostaria de saber um fato ou curiosidade ?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        96
+      ],
+      "id": "bcc2c60f-829d-47b8-8e99-7d5ab2298bcd",
+      "name": "Caminho False"
+    },
+    {
+      "parameters": {
+        "url": "https://uselessfacts.jsph.pl/api/v2/facts/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "145e8645-9ac0-45db-b593-2f172768e2cf",
+      "name": "Busca curiosidade aleatória"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "16f21e98-5140-4a53-86d9-391435ff7b52",
+              "leftValue": "={{ $json.eValido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "5c011e53-5206-4f21-a358-cae82953a65d",
+      "name": "Valida pedido de curiosidade"
+    },
+    {
+      "parameters": {
+        "content": "Gatilho (Tigger)",
+        "height": 384,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "aa4656cc-506b-469d-b9d0-662b5a5569e5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Lógica e Processamento (Logic & Processing)",
+        "height": 384,
+        "width": 864,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "dac2e74b-f806-4a8d-8967-bd2cb22016dd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Ação e Saída (Output / Action)",
+        "height": 384,
+        "width": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1056,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "d73d56d5-9734-4e86-8e6c-e76022727da8",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Recebe mensagem do usuário": {
+      "main": [
+        [
+          {
+            "node": "Normaliza e valida Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tradução ao português": {
+      "main": [
+        [
+          {
+            "node": "Formata saída de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normaliza e valida Input": {
+      "main": [
+        [
+          {
+            "node": "Valida pedido de curiosidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca curiosidade aleatória": {
+      "main": [
+        [
+          {
+            "node": "tradução ao português",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valida pedido de curiosidade": {
+      "main": [
+        [
+          {
+            "node": "Busca curiosidade aleatória",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Caminho False",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a5ba21a4-6f28-4511-a3ca-1d5bb6ee232a",
+  "meta": {
+    "instanceId": "45908a861218fc48d1b2bc7fdddd681c239ae942d1582aec1b81028930127efe"
+  },
+  "id": "ExPBG7i05gQOtyia",
+  "tags": []
+}

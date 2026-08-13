@@ -1,0 +1,295 @@
+{
+  "name": "Workflow de fatos animais - dog e cat",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "add52fd7-f63d-43f8-8b99-fd14b4e6036c",
+              "leftValue": "={{ $json.chatInput.toLowerCase() }}",
+              "rightValue": "cachorro",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "9559c6c1-81fa-4e03-8055-8094051beff6",
+              "leftValue": "={{ $json.chatInput.toLowerCase() }}",
+              "rightValue": "cão",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "94988e20-5c69-4fd2-a167-eeb826e0be25",
+              "leftValue": "={{ $json.chatInput.toLowerCase() }}",
+              "rightValue": "dog",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "75650d23-136e-4edc-aabc-0dcdca427f9b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Olá. Sou um assistente de curiosidades sobre animais  🐾 .\n\nVocê quer saber uma curiosidade sobre gatos 🐱 ou sobre cachorros 🐶 ?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a7d3b478-5c88-4d6b-b432-c998160973b6",
+      "name": "Receber mensagem do usuário",
+      "webhookId": "815dd526-139e-4299-a40d-0b64f4f44d46"
+    },
+    {
+      "parameters": {
+        "url": "https://some-random-api.com/animal/dog",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        -32
+      ],
+      "id": "59bc1cb2-8217-47af-8ee2-2013b6ffad5d",
+      "name": "Buscar curiosidade - cachorro"
+    },
+    {
+      "parameters": {
+        "url": "https://catfact.ninja/fact",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        192
+      ],
+      "id": "68bfe2ff-25d8-4aa0-908b-77b97db4a279",
+      "name": "Buscar curiosidade - gato"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        224
+      ],
+      "id": "d4a0a873-8bb5-4d77-95ef-1fdce2c4bab7",
+      "name": "Gemini Model 3.6 Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gx9eo3XQoh2rGbmY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Traduza o seguinte texto sobre animais para o português do Brasil. Retorne APENAS o texto traduzido, sem explicações adicionais:\n\n{{ $json.fact }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        0
+      ],
+      "id": "060a0b76-0e01-4354-8966-e0714b9c757c",
+      "name": "Traduzir texto ao português"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1e888ab2-a3a4-46f0-973a-7cf1976cd3bd",
+              "name": "output",
+              "value": "=Curiosidade: {{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "1cb674fb-a3e2-48c0-88f0-11b05bd741cf",
+      "name": "Formatar saída de texto"
+    },
+    {
+      "parameters": {
+        "content": "Gatilho (Trigger)",
+        "height": 240,
+        "width": 272,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "24c2a4ee-c5d1-47d9-ab92-9e47dbb408e8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Lógica e Processamento (Logic & Processing)",
+        "height": 448,
+        "width": 688,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "660f4cb6-7418-4a18-8d93-de33d4a4d358",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Ação e Saída (Output / Action)",
+        "height": 240,
+        "width": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "6b3e5c6c-f061-471b-a0ed-80472e116e9c",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Buscar curiosidade - cachorro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar curiosidade - gato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receber mensagem do usuário": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar curiosidade - cachorro": {
+      "main": [
+        [
+          {
+            "node": "Traduzir texto ao português",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar curiosidade - gato": {
+      "main": [
+        [
+          {
+            "node": "Traduzir texto ao português",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model 3.6 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Traduzir texto ao português",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traduzir texto ao português": {
+      "main": [
+        [
+          {
+            "node": "Formatar saída de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "767907c9-2a90-4e5a-911b-ec3ac6d4bd38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "45908a861218fc48d1b2bc7fdddd681c239ae942d1582aec1b81028930127efe"
+  },
+  "id": "UMyExiBzMmn1E8Ce",
+  "tags": []
+}
