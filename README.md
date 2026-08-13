@@ -27,4 +27,4 @@ Coleção de workflows de automação desenvolvidos no **n8n**, focados em integ
 ---
 
 ## 👤 Autor
-Desenvolvido por **Marcos S. Silva**
+Desenvolvido por **Marcos Suguimoto**
