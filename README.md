@@ -1,4 +1,4 @@
-# 🚀 n8n Automations Library
+# Workflows de Automação e Integração de APIs no n8n
 
 Coleção de workflows de automação desenvolvidos no **n8n**, focados em integração de APIs REST, manipulação de JSON, validação de dados via JavaScript e resiliência de serviços.
 
